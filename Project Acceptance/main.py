@@ -79,6 +79,7 @@ class Ui_MainWindow(object):
         self.reset_btn.setEnabled(True)
         self.reset_btn.setGeometry(QtCore.QRect(30, 218, 91, 24))
         self.reset_btn.setObjectName("reset_btn")
+        self.reset_btn.clicked.connect(lambda:self.reset_all())
         self.work_area = QtWidgets.QFrame(self.centralwidget)
         self.work_area.setGeometry(QtCore.QRect(10, 10, 153, 94))
         self.work_area.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
@@ -116,7 +117,7 @@ class Ui_MainWindow(object):
         self.development_checkB.stateChanged.connect(self.onStateChange) # custom
         self.CIP_checkB.stateChanged.connect(self.onStateChange) # custom
 
-        self.tableview = QtWidgets.QTableView(self.centralwidget)
+        self.tableview = QtWidgets.QTableWidget(self.centralwidget)
         self.tableview.setGeometry(QtCore.QRect(190, 10,user32.GetSystemMetrics(0) - 225,user32.GetSystemMetrics(1) - 300 )) # custom
         self.tableview.setObjectName("tableView")
         
@@ -199,6 +200,24 @@ class Ui_MainWindow(object):
         self.open_existing_Btn.setEnabled(True)
         self.create_new_Btn.setEnabled(True)
         self.create_pdf.setEnabled(True)
+
+    def reset_all(self):
+        self.development_checkB.setChecked(False)
+        self.development_checkB.setEnabled(False)
+        self.CIP_checkB.setChecked(False)
+        self.CIP_checkB.setEnabled(False)
+        self.work_entry.clear()
+        self.planfile_entry.clear()
+        self.planfile_entry.setEnabled(False)
+        self.pressure_checkB.setChecked(False)
+        self.gravity_checkB.setChecked(False)
+        self.pump_checkB.setChecked(False)
+        self.pressure_checkB.setEnabled(False)
+        self.gravity_checkB.setEnabled(False)
+        self.pump_checkB.setEnabled(False)
+        self.pump_folder.setChecked(False)
+        self.gravity_folder.setChecked(False)
+        self.pressure_folder.setChecked(False)
 
 
 if __name__ == "__main__":
