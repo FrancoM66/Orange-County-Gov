@@ -6,7 +6,7 @@ import excel
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
+        MainWindow.setObjectName("Excel Exterminator")
         MainWindow.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         MainWindow.setEnabled(True)
         user32 = ctypes.windll.user32 # custom
@@ -117,7 +117,7 @@ class Ui_MainWindow(object):
         self.development_checkB.stateChanged.connect(self.onStateChange) # custom
         self.CIP_checkB.stateChanged.connect(self.onStateChange) # custom
 
-        self.tableview = QtWidgets.QTableWidget(self.centralwidget)
+        self.tableview = QtWidgets.QTableView(self.centralwidget)
         self.tableview.setGeometry(QtCore.QRect(190, 10,user32.GetSystemMetrics(0) - 225,user32.GetSystemMetrics(1) - 300 )) # custom
         self.tableview.setObjectName("tableView")
         
