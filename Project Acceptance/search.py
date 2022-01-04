@@ -7,7 +7,7 @@ def search_clicked(self,workOrder,development, cip, pump, pressure, gravity):
     print("made it to function")
     path = "O:\Field Services Division\Field Support Center\Project Acceptance"
     if workOrder != "" and len(workOrder) >= 5:
-        for root, subdir, files in os.walk('O:\Field Services Division\Field Support Center\Project Acceptance'):
+        for root, subdir, files in os.walk(path):
             for d in subdir:
                 if d.find(workOrder) != -1:
                         print(d)

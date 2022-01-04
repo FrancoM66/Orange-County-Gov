@@ -75,6 +75,11 @@ class Ui_MainWindow(object):
         self.create_pdf.setEnabled(False)
         self.create_pdf.setGeometry(QtCore.QRect(30, 100, 91, 24))
         self.create_pdf.setObjectName("create_pdf")
+        self.save_btn = QtWidgets.QPushButton(self.options_pane)
+        self.save_btn.setEnabled(False)
+        self.save_btn.setGeometry(QtCore.QRect(30, 130, 91, 24))
+        self.save_btn.setObjectName("save_btn")
+        self.save_btn.clicked.connect(lambda:excel.check_b4_save(self))
         self.reset_btn = QtWidgets.QPushButton(self.options_pane)
         self.reset_btn.setEnabled(True)
         self.reset_btn.setGeometry(QtCore.QRect(30, 218, 91, 24))
@@ -120,7 +125,6 @@ class Ui_MainWindow(object):
         self.tableview = QtWidgets.QTableView(self.centralwidget)
         self.tableview.setGeometry(QtCore.QRect(190, 10,user32.GetSystemMetrics(0) - 225,user32.GetSystemMetrics(1) - 300 )) # custom
         self.tableview.setObjectName("tableView")
-        
         self.select_folder_3 = QtWidgets.QFrame(self.centralwidget)
         self.select_folder_3.setGeometry(QtCore.QRect(10, 410, 125, 110))
         self.select_folder_3.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
@@ -174,6 +178,7 @@ class Ui_MainWindow(object):
         self.open_existing_Btn.setText(_translate("MainWindow", "Open Existing"))
         self.create_new_Btn.setText(_translate("MainWindow", "Create New"))
         self.create_pdf.setText(_translate("MainWindow", "Create PDF"))
+        self.save_btn.setText(_translate("MainWindow", "Save Changes"))
         self.reset_btn.setText(_translate("MainWindow", "Reset All Fields"))
         self.label_2.setText(_translate("MainWindow", "Work Area"))
         self.work_entry_Btn.setText(_translate("MainWindow", "Enter"))
@@ -200,6 +205,7 @@ class Ui_MainWindow(object):
         self.open_existing_Btn.setEnabled(True)
         self.create_new_Btn.setEnabled(True)
         self.create_pdf.setEnabled(True)
+        self.save_btn.setEnabled(True)
 
     def reset_all(self):
         self.development_checkB.setChecked(False)
@@ -208,6 +214,7 @@ class Ui_MainWindow(object):
         self.CIP_checkB.setEnabled(False)
         self.work_entry.clear()
         self.planfile_entry.clear()
+        self.save_btn.setEnabled(False)
         self.planfile_entry.setEnabled(False)
         self.pressure_checkB.setChecked(False)
         self.gravity_checkB.setChecked(False)
