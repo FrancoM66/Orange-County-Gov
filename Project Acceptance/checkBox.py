@@ -1,10 +1,12 @@
 from PyQt6.QtWidgets import QMessageBox
- 
-def check_work_area(self,pump_checkB,pressure_checkB,gravity_checkB, planfile_Btn,planfile_entry, work_entry):
 
-    pump_string = {'Pump', 'pump', 'pumpstation', 'PumpStation','Pumpstation'}
-    pressure_string = {"Pressure", "Pressurized", "Pressurized Pipe", "Pipe", "pressure","pressurized"}
-    wastewater_string = {"Gravity" , "gravity" , "wastewater" , "WasteWater"}
+
+def check_work_area(self, pump_checkB, pressure_checkB, gravity_checkB, planfile_Btn, planfile_entry, work_entry):
+
+    pump_string = {'Pump', 'pump', 'pumpstation', 'PumpStation', 'Pumpstation'}
+    pressure_string = {"Pressure", "Pressurized",
+                       "Pressurized Pipe", "Pipe", "pressure", "pressurized"}
+    wastewater_string = {"Gravity", "gravity", "wastewater", "WasteWater"}
 
     if work_entry in pump_string:
         print("1")
