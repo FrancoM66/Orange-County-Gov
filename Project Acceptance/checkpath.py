@@ -14,7 +14,7 @@ def check_path(concat):
         pressure = 1
     else:
         print("pressure folder not found")
-        pressure = 1
+        pressure = 0
 
     if os.path.isdir(concat + "/" + "Wastewater"):
         print("we in gravity")

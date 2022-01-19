@@ -1,3 +1,4 @@
+from fileinput import filename
 from PyQt6 import QtGui
 from PyQt6 import QtCore
 from PyQt6 import QtWidgets
@@ -135,12 +136,17 @@ def filename_checker(self, concat, pump_checkB, gravity_checkB, pressure_checkB,
         self.code = 6
 
     self.excel_filename = concat + "/Excel/" + self.filename
+    
 
 # Initialized the table
-def init_table(self, table, concat, pump_checkB, gravity_checkB, pressure_checkB, cip_checkB, development_checkB):
+def init_table(self, table, concat, pump_checkB, gravity_checkB, pressure_checkB, cip_checkB, development_checkB,template, variation):
 
     filename_checker(self, concat, pump_checkB, gravity_checkB,
                      pressure_checkB, cip_checkB, development_checkB)
+
+    if template!= "":
+        self.excel_filename = template
+        self.variation = variation
 
     print("in excel.py")
     print(self.excel_filename)
@@ -171,6 +177,11 @@ def add_rows(self, table):
 
     table.setModel(self.model)
     table.show()
+
+def remove_row(self, table):
+    x = table.selectionModel().selectedIndexes()
+    print(x)
+
 
 def set_delegates(self, table):
 
@@ -216,9 +227,13 @@ def set_delegates(self, table):
    
     if self.code == 1:
         table.setItemDelegateForColumn(0, category_delegate)
+        table.setItemDelegateForColumn(4, options_delegate)
+        table.setItemDelegateForColumn(6, options_delegate)
 
     if self.code == 2:
         table.setItemDelegateForColumn(0, category_delegate)
+        table.setItemDelegateForColumn(4, options_delegate)
+        table.setItemDelegateForColumn(6, options_delegate)
 
     if self.code == 3:
         table.setItemDelegateForColumn(4, structure_delegate)
@@ -242,15 +257,19 @@ def set_delegates(self, table):
 
     if self.code == 5:
         table.setItemDelegateForColumn(0, category_delegate)
-        table.setItemDelegateForColumn(3, structure_delegate)
+        table.setItemDelegateForColumn(4, structure_delegate)
+        table.setItemDelegateForColumn(6, structure_delegate)
 
     if self.code == 6:
         table.setItemDelegateForColumn(0, category_delegate)
         table.setItemDelegateForColumn(3, structure_delegate)
+        table.setItemDelegateForColumn(4, options_delegate)
+        table.setItemDelegateForColumn(6, options_delegate)
 
 
 def exportToExcel(self):
     columnHeaders = []
+    
 
     # create column header list
     for j in range(self.setter.model().columnCount()):
@@ -264,8 +283,8 @@ def exportToExcel(self):
         for col in range(self.setter.model().columnCount()):
             dfnew.at[row, columnHeaders[col]
                      ] = self.setter.model().index(row, col).data()
-
-    dfnew.to_csv(self.excel_filename, index=False)
+    # TODO: Change this from hard coding
+    dfnew.to_csv(self.concat + "/Excel" + self.variation, index=False)
     print('Excel file exported')
 
 

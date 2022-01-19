@@ -1,10 +1,15 @@
+from operator import concat
+import os
 from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtWidgets import QMessageBox
 import ctypes
 import checkBox
 import search
 import excel
+import createfolder
 
 class Ui_MainWindow(object):
+    
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("Excel Exterminator")
         MainWindow.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
@@ -70,20 +75,21 @@ class Ui_MainWindow(object):
         self.open_existing_Btn.setObjectName("open_existing_Btn")
 
         self.open_existing_Btn.clicked.connect(lambda: excel.init_table(
-            self, self.tableview, self.concat, self.pump_checkB, self.gravity_checkB, self.pressure_checkB, self.CIP_checkB, self.development_checkB))
+            self, self.tableview, self.concat, self.pump_checkB, self.gravity_checkB, self.pressure_checkB, self.CIP_checkB, self.development_checkB, "",""))
 
+        
         # self.open_existing_Btn.clicked.connect(lambda: test2.loadExcelData(self, self.tableview, self.concat, self.pump_checkB, self.gravity_checkB, self.pressure_checkB, self.CIP_checkB, self.development_checkB))
         
         self.add_row = QtWidgets.QPushButton(self.options_pane)
-        self.add_row.setEnabled(True)
+        self.add_row.setEnabled(False)
         self.add_row.setGeometry(QtCore.QRect(30, 160, 91, 24))
         self.add_row.setObjectName("add_row")
         self.add_row.clicked.connect(lambda: excel.add_rows(self,self.tableview))
-
         self.create_new_Btn = QtWidgets.QPushButton(self.options_pane)
         self.create_new_Btn.setEnabled(False)
         self.create_new_Btn.setGeometry(QtCore.QRect(30, 70, 91, 24))
         self.create_new_Btn.setObjectName("create_new_Btn")
+        self.create_new_Btn.clicked.connect(lambda: createfolder.create_new(self, self.concat))
         self.create_pdf = QtWidgets.QPushButton(self.options_pane)
         self.create_pdf.setEnabled(False)
         self.create_pdf.setGeometry(QtCore.QRect(30, 100, 91, 24))
@@ -174,6 +180,9 @@ class Ui_MainWindow(object):
         self.open_existing_Btn.clicked.connect(lambda:self.reset_btn.setEnabled(False))
         self.open_existing_Btn.clicked.connect(lambda:self.work_entry_Btn.setEnabled(False))
         self.open_existing_Btn.clicked.connect(lambda:self.planfile_Btn.setEnabled(False))
+        self.open_existing_Btn.clicked.connect(lambda:self.add_row.setEnabled(True))
+        self.open_existing_Btn.clicked.connect(lambda:self.create_pdf.setEnabled(True))
+        self.open_existing_Btn.clicked.connect(lambda:self.save_btn.setEnabled(True))
         
         MainWindow.setStatusBar(self.statusbar)
 
@@ -231,11 +240,31 @@ class Ui_MainWindow(object):
             self.CIP_checkB.setChecked(False)
             self.development_checkB.setEnabled(False)
 
-        self.open_existing_Btn.setEnabled(True)
-        self.create_new_Btn.setEnabled(True)
-        self.create_pdf.setEnabled(True)
-        self.save_btn.setEnabled(True)
+        if self.pump_checkB.isChecked() and self.pump_folder.isChecked():
 
+            self.open_existing_Btn.setEnabled(True)
+            self.create_new_Btn.setEnabled(False)
+            
+
+        elif self.gravity_checkB.isChecked() and self.gravity_folder.isChecked():
+            self.open_existing_Btn.setEnabled(True)
+            self.create_new_Btn.setEnabled(False)
+            
+
+        elif self.pressure_checkB.isChecked() and self.pressure_folder.isChecked():
+
+            self.open_existing_Btn.setEnabled(True)
+            self.create_new_Btn.setEnabled(False)
+            
+
+        else:
+            self.open_existing_Btn.setEnabled(False)
+            self.create_new_Btn.setEnabled(True)
+            self.create_pdf.setEnabled(False)
+            self.save_btn.setEnabled(False)
+            self.add_row.setEnabled(False)
+
+    
     def reset_all(self):
         self.development_checkB.setChecked(False)
         self.development_checkB.setEnabled(False)
@@ -256,11 +285,11 @@ class Ui_MainWindow(object):
         self.pump_folder.setChecked(False)
         self.gravity_folder.setChecked(False)
         self.pressure_folder.setChecked(False)
-        excel.reset_table(self.tableview)
         
+
     
         
-if __name__ == "__main__":
+def main():
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
@@ -268,3 +297,7 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec())
+
+            
+if __name__ == "__main__":
+    main()
