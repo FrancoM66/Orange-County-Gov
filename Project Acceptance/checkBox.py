@@ -1,38 +1,39 @@
 from PyQt6.QtWidgets import QMessageBox
 
-
-def check_work_area(self, pump_checkB, pressure_checkB, gravity_checkB, planfile_Btn, planfile_entry, work_entry):
+def check_work_area(self):
 
     pump_string = {'Pump', 'pump', 'pumpstation', 'PumpStation', 'Pumpstation'}
-    pressure_string = {"Pressure", "Pressurized",
-                       "Pressurized Pipe", "Pipe", "pressure", "pressurized"}
+    pressure_string = {"Pressure", "Pressurized","Pressurized Pipe", "Pipe", "pressure", "pressurized"}
     wastewater_string = {"Gravity", "gravity", "wastewater", "WasteWater"}
 
-    if work_entry in pump_string:
+    work_entry_text = self.work_entry.text()
+
+    if work_entry_text in pump_string:
         print("1")
-        pump_checkB.setChecked(True)
-        pressure_checkB.setChecked(False)
-        gravity_checkB.setChecked(False)
-        planfile_Btn.setEnabled(True)
-        planfile_entry.setEnabled(True)
-    elif work_entry in pressure_string:
+        self.pump_checkB.setChecked(True)
+        self.pressure_checkB.setChecked(False)
+        self.gravity_checkB.setChecked(False)
+        self.planfile_Btn.setEnabled(True)
+        self.planfile_entry.setEnabled(True)
+    elif work_entry_text in pressure_string:
         print("2")
-        pump_checkB.setChecked(False)
-        pressure_checkB.setChecked(True)
-        gravity_checkB.setChecked(False)
-        planfile_Btn.setEnabled(True)
-        planfile_entry.setEnabled(True)
-    elif work_entry in wastewater_string:
+        self.pump_checkB.setChecked(False)
+        self.pressure_checkB.setChecked(True)
+        self.gravity_checkB.setChecked(False)
+        self.planfile_Btn.setEnabled(True)
+        self.planfile_entry.setEnabled(True)
+    elif work_entry_text in wastewater_string:
         print("3")
-        pump_checkB.setChecked(False)
-        gravity_checkB.setChecked(True)
-        pressure_checkB.setChecked(False)
-        planfile_Btn.setEnabled(True)
-        planfile_entry.setEnabled(True)
+        self.pump_checkB.setChecked(False)
+        self.gravity_checkB.setChecked(True)
+        self.pressure_checkB.setChecked(False)
+        self.planfile_Btn.setEnabled(True)
+        self.planfile_entry.setEnabled(True)
     else:
         showError()
-        planfile_Btn.setEnabled(False)
-        planfile_entry.setEnabled(False)
+        self.planfile_Btn.setEnabled(False)
+        self.planfile_entry.setEnabled(False)
+        
 
 
 def showError():

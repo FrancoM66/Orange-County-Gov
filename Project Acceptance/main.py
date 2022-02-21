@@ -102,7 +102,7 @@ class UI_Main_Window(object):
 
         # options frame set on screen
         self.options_pane = QtWidgets.QFrame(self.central_widget)
-        self.options_pane.setGeometry(QtCore.QRect(10, 520, 141, 261))
+        self.options_pane.setGeometry(QtCore.QRect(10, 520, 141, 300))
         self.options_pane.setFrameShadow(QtWidgets.QFrame.Shadow.Raised)
         self.options_pane.setObjectName("options_pane")
 
@@ -207,8 +207,14 @@ class UI_Main_Window(object):
         # reset button
         self.reset_btn = QtWidgets.QPushButton(self.options_pane)
         self.reset_btn.setEnabled(True)
-        self.reset_btn.setGeometry(QtCore.QRect(30, 218, 91, 24))
+        self.reset_btn.setGeometry(QtCore.QRect(30, 250, 91, 24))
         self.reset_btn.setObjectName("reset_btn")
+
+        # warranty all accepted button
+        self.warranty_btn = QtWidgets.QPushButton(self.options_pane)
+        self.warranty_btn.setEnabled(True)
+        self.warranty_btn.setGeometry(QtCore.QRect(30, 220, 91, 24))
+        self.warranty_btn.setObjectName("warranty_btn")
 
         # Picture
         label = QtWidgets.QLabel(self.central_widget)
@@ -216,27 +222,24 @@ class UI_Main_Window(object):
         label.setPixmap(pixmap)
         xpos = screen_size_x - 225
         label.setGeometry(QtCore.QRect(xpos/2 -100, 10, screen_size_x - 225, screen_size_y - 100))
-
+        
         # setting names for the labels
         self.retranslateUi(MainWindow)
+        self.isFirst = False
 
-        # button clicked Functions
+        # button clicked Functions              
         self.planfile_Btn.clicked.connect(lambda: search.search_clicked(self)) 
-
         self.open_existing_Btn.clicked.connect(lambda: excel.init_table(self,"",""))
-
         self.add_row.clicked.connect(lambda: excel.add_rows(self,self.tableview))
-
         self.del_row.clicked.connect(lambda: excel.remove_row(self,self.tableview))
-
+    
+        self.warranty_btn.clicked.connect(lambda: excel.send(self))
+        
+        self.create_new_Btn.clicked.connect(lambda: search.search_clicked(self))
         self.create_new_Btn.clicked.connect(lambda: createfolder.create_new(self))
-
         self.send_to_sign.clicked.connect(lambda: excel.pandas2word(self))
-
         self.save_btn.clicked.connect(lambda: excel.check_b4_save(self))
-
         self.reset_btn.clicked.connect(lambda: self.reset_all())
-
         self.work_entry_Btn.clicked.connect(lambda: checkBox.check_work_area(self))
 
         self.open_existing_Btn.clicked.connect(lambda:self.reset_btn.setEnabled(False))
@@ -248,7 +251,7 @@ class UI_Main_Window(object):
         self.open_existing_Btn.clicked.connect(lambda:self.save_btn.setEnabled(True))
         self.open_existing_Btn.clicked.connect(lambda:self.open_existing_Btn.setEnabled(False))
 
-        self.development_checkB.stateChanged.connect(self.onStateChange)  # custom
+        self.development_checkB.stateChanged.connect(self.onStateChange)
         self.CIP_checkB.stateChanged.connect(self.onStateChange) 
         
         self.open_existing_Btn.clicked.connect(lambda:label.setHidden(True))
@@ -273,6 +276,7 @@ class UI_Main_Window(object):
         self.reset_btn.setText(_translate("MainWindow", "Reset All Fields"))
         self.work_area_label.setText(_translate("MainWindow", "Work Area"))
         self.work_entry_Btn.setText(_translate("MainWindow", "Enter"))
+        self.warranty_btn.setText(_translate("MainWindow", "Send Signed"))
         self.Dev_or_CIP_label.setText(_translate("MainWindow", "Development or CIP"))
         self.development_checkB.setText(_translate("MainWindow", "Development"))
         self.CIP_checkB.setText(_translate("MainWindow", "CIP"))
@@ -296,18 +300,21 @@ class UI_Main_Window(object):
 
             self.open_existing_Btn.setEnabled(True)
             self.create_new_Btn.setEnabled(False)
+            self.warranty_btn.setEnabled(True)
             
 
         elif self.gravity_checkB.isChecked() and self.gravity_folder.isChecked():
             self.open_existing_Btn.setEnabled(True)
             self.create_new_Btn.setEnabled(False)
+            self.warranty_btn.setEnabled(True)
             
 
         elif self.pressure_checkB.isChecked() and self.pressure_folder.isChecked():
 
             self.open_existing_Btn.setEnabled(True)
             self.create_new_Btn.setEnabled(False)
-            
+            self.warranty_btn.setEnabled(True)
+
 
         else:
             self.open_existing_Btn.setEnabled(False)
@@ -316,6 +323,7 @@ class UI_Main_Window(object):
             self.save_btn.setEnabled(False)
             self.add_row.setEnabled(False)
             self.del_row.setEnabled(False)
+            
 
     
     def reset_all(self):
