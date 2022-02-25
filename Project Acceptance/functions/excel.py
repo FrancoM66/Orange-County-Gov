@@ -1,15 +1,18 @@
+from email import header
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets
 from win32com import client
 from PyQt6.QtCore import QAbstractTableModel, QModelIndex,Qt
-from PyQt6.QtWidgets import QComboBox, QItemDelegate,QMessageBox
+from PyQt6.QtWidgets import QComboBox, QItemDelegate,QMessageBox,QInputDialog,QWidget
+import shutil
 import pandas as pd
 import configparser
 import json
+import functions.word as word
+import functions.mail as mail
+import functions.example as pop_word
 
 # Creates the model for the QTableView
-
-
 class PandasModel(QAbstractTableModel):
     def __init__(self, data):
         super().__init__()
@@ -96,6 +99,7 @@ class ComboBoxDelegate(QItemDelegate):
 
 structure_delegate = ComboBoxDelegate()
 category_delegate = ComboBoxDelegate()
+category_pump_delegate = ComboBoxDelegate()
 approved_cctv_delegate = ComboBoxDelegate()
 vendor = ComboBoxDelegate()
 reviewer_delegate = ComboBoxDelegate()
@@ -112,37 +116,102 @@ def filename_checker(self):
         if self.pump_checkB.isChecked() and self.CIP_checkB.isChecked():
             self.filename = "CIP Pump.csv"
             self.code = 1
-            self.directory_code = self.concat+"/Pump"
+            self.directory_code = self.concat+"/Pump-Station"
+            self.area = "Pump-Station"
+            self.cip_dev = "CIP"
 
         if self.pump_checkB.isChecked() and self.development_checkB.isChecked():
             self.filename = "Development Pump.csv"
             self.code = 2
-            self.directory_code = self.concat+"/Pump"
+            self.directory_code = self.concat+"/Pump-Station"
+            self.area = "Pump-Station"
+            self.cip_dev = "Dev"
 
         if self.gravity_checkB.isChecked() and self.CIP_checkB.isChecked():
-            self.filename = "CIP Gravity.csv"
+            self.filename = "Cip Gravity.csv"
             self.code = 3
             self.directory_code = self.concat+"/Wastewater"
+            self.area = "Gravity"
+            self.cip_dev = "CIP"
 
         if self.gravity_checkB.isChecked() and self.development_checkB.isChecked():
             self.filename = "Development Gravity.csv"
             self.code = 4
             self.directory_code = self.concat+"/Wastewater"
+            self.area = "Gravity"
+            self.cip_dev = "Dev"
 
         if self.pressure_checkB.isChecked() and self.CIP_checkB.isChecked():
             self.filename = "CIP Pressure.csv"
             self.code = 5
-            self.directory_code = self.concat+"/Pressurized Pipe"
+            self.directory_code = self.concat+"/Pressurized-Pipe"
+            self.area = "Pressurized-Pipe"
+            self.cip_dev = "CIP"
 
         if self.pressure_checkB.isChecked() and self.development_checkB.isChecked():
             self.filename = "Development Pressure.csv"
             self.code = 6
-            self.directory_code = self.concat+"/Pressurized Pipe"
+            self.directory_code = self.concat+"/Pressurized-Pipe"
+            self.area = "Pressurized-Pipe"
+            self.cip_dev = "Dev"
 
         self.excel_filename = self.concat + "/Excel/" + self.filename
 
+class App(QWidget):
+    global acceptedorrejected
+    global walkthroughorwarranty
+    global workorder
+
+    def __init__(self):
+        super().__init__()
+        self.title = 'PyQt5 input dialogs - pythonspot.com'
+        self.left = 10
+        self.top = 10
+        self.width = 640
+        self.height = 480
+        self.initUI()
+    
+    def initUI(self):
+        # self.setWindowTitle(self.title)
+        # self.setGeometry(self.left, self.top, self.width, self.height)
+        # self.center()
+
+        self.getChoice()
+        self.getText()
+        
+        # self.show()
+
+    def getChoice(self):
+        accepted_rejected = ("","Acceptance","Rejection")
+        walkthrough_warranty = ("Walkthrough","Warranty")
+        self.item2, okPressed = QInputDialog.getItem(self, "Get item","Walkthrough or Warranty:", walkthrough_warranty, 0, False)
+        self.item, okPressed = QInputDialog.getItem(self, "Get item","Accepted or Rejected:", accepted_rejected, 0, False)
+        if okPressed and self.item and self.item2:
+            print(self.item)
+            print(self.item2)
+
+    def getText(self):
+        self.text, okPressed = QInputDialog.getText(self, "Get text","Please Enter Inspection Date mm-dd-yyyy:",  QtWidgets.QLineEdit.EchoMode.Normal, "")
+        if okPressed and self.text != '':
+            print(self.text)
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
+def send(self):
+    filename_checker(self)
+    print(self.directory_code)
+    mail.mail_signed(self,self.directory_code)
+
 # Initialized the table
 def init_table(self,template, variation):
+
+    # for proc in psutil.process_iter():
+    #     if proc.name() == "excel.exe":
+    #         proc.kill()
 
     filename_checker(self)
 
@@ -164,7 +233,7 @@ def init_table(self,template, variation):
     self.model = PandasModel(self.df)
 
     self.tableview.setModel(self.model)
-    self.tableview.resizeRowsToContents()
+    # self.tableview.resizeRowsToContents()
     self.tableview.horizontalHeader().setStretchLastSection(True)
     self.tableview.setWordWrap(True)
     self.tableview.show()
@@ -193,7 +262,6 @@ def remove_row(self, table):
 
     table.setModel(self.model)
     self.df = new_model
-    
     table.show()
     
 def set_delegates(self, table):
@@ -236,29 +304,30 @@ def set_delegates(self, table):
 
     pump_values = config.get("PUMP", "category")
     pump_value_list = json.loads(pump_values)
-    category_delegate.setItems(pump_value_list)
-   
+    category_pump_delegate.setItems(pump_value_list)
+
     if self.code == 1:
-        table.setItemDelegateForColumn(0, category_delegate)
+        table.setItemDelegateForColumn(0, category_pump_delegate)
         table.setItemDelegateForColumn(4, options_delegate)
         table.setItemDelegateForColumn(6, options_delegate)
 
     if self.code == 2:
-        table.setItemDelegateForColumn(0, category_delegate)
+        table.setItemDelegateForColumn(0, category_pump_delegate)
         table.setItemDelegateForColumn(4, options_delegate)
         table.setItemDelegateForColumn(6, options_delegate)
 
     if self.code == 3:
         table.setItemDelegateForColumn(4, structure_delegate)
         table.setItemDelegateForColumn(5, action_delegate)
-        table.setItemDelegateForColumn(7, approved_cctv_delegate)
-        table.setItemDelegateForColumn(8, options_delegate)
-        table.setItemDelegateForColumn(10, reviewer_delegate)
-        table.setItemDelegateForColumn(11, corrective_delegate)
-        table.setItemDelegateForColumn(13, options_delegate)
-        table.setItemDelegateForColumn(14, vendor)
-        table.setItemDelegateForColumn(15, reviewer_delegate)
-        table.setItemDelegateForColumn(16, corrective_delegate)
+        table.setItemDelegateForColumn(6, approved_cctv_delegate)
+        table.setItemDelegateForColumn(7, options_delegate)
+        table.setItemDelegateForColumn(8, vendor)
+        table.setItemDelegateForColumn(9, reviewer_delegate)
+        table.setItemDelegateForColumn(10, corrective_delegate)
+        table.setItemDelegateForColumn(12, options_delegate)
+        # table.setItemDelegateForColumn(14, vendor)
+        table.setItemDelegateForColumn(14, reviewer_delegate)
+        table.setItemDelegateForColumn(15, corrective_delegate)
 
     if self.code == 4:
         table.setItemDelegateForColumn(2, approved_cctv_delegate)
@@ -294,82 +363,135 @@ def exportToExcel(self, table):
     # create dataframe object recordset
     for row in range(setter.model().rowCount()):
         for col in range(setter.model().columnCount()):
-            dfnew.at[row, columnHeaders[col]
-                     ] = setter.model().index(row, col).data()
+            dfnew.at[row, columnHeaders[col]] = setter.model().index(row, col).data()
     
     dfnew.to_csv(self.concat + "/Excel" + self.variation1, index=False)
     print('Excel file exported')
 
 
 def pandas2word(self):
-    name = r"O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\Temp\temp.xlsx"
-    writer = pd.ExcelWriter(name, engine='xlsxwriter')
-    # filtered_df = self.df.loc[:, ~self.df.columns.isin(["Subarea","Notes", "Notes.1"])]
-
-    # Get the xlsxwriter workbook and worksheet objects.
-    self.df.to_excel(writer, sheet_name='Sheet1')
-   
-    workbook  = writer.book
-    cell_format = workbook.add_format()
-    cell_format.set_text_wrap()
-    red = workbook.add_format({'bg_color': '#ffcccb'})
-    green = workbook.add_format({'bg_color': '#90EE90'})
-    orange = workbook.add_format({'bg_color': 'yellow'})
-
-    worksheet = writer.sheets['Sheet1']
-    worksheet.conditional_format('A1:Z100',
-                                                {'type': 'text',
-                                                'criteria': 'containing',
-                                                'value': 'Rejected',
-                                                'format':red
-                                                })
-
-    worksheet.conditional_format('A1:Z100',
-                                                {'type': 'text',
-                                                'criteria': 'containing',
-                                                'value': 'Accepted',
-                                                'format':green
-                                                })
-
-    worksheet.conditional_format('A1:Z100',
-                                                {'type': 'text',
-                                                'criteria': 'containing',
-                                                'value': 'Removed',
-                                                'format':orange
-                                                })
-
-    writer.save()
-    writer.close()
-    create_pdf(self,name)
-
-
-def create_pdf(self,name):
+    self.getchoice = App()
     
-    name2 = self.directory_code
-    # Open Microsoft Excel
-    excel = client.Dispatch("Excel.Application")
-    # Read Excel File
-    sheets = excel.Workbooks.Open(name)
-    work_sheets = sheets.Worksheets[0]
-    work_sheets.Range("A1:A100").ColumnWidth = 0
-    work_sheets.Range("B1:Z1").ColumnWidth = 15
-    work_sheets.PageSetup.FitToPagesWide = 1
-    work_sheets.Range("B1:Z100").Font.Size = 14
-    # work_sheets.Rows.AutoFit()
-    work_sheets.Columns.WrapText = True
-    work_sheets.PageSetup.Orientation = 2
-    
-    # Convert into PDF File
-    work_sheets.ExportAsFixedFormat(0, name2)
-    sheets.Close(True)
-    excel.Application.Quit()
+    if self.getchoice.item == "Acceptance" and self.getchoice.item2 == "Walkthrough":
+        found = self.df[self.df['Walkthrough'].str.contains('Rejected')]
+        found2 = len(self.df[self.df['Walkthrough'] == '']) 
+        if len(found) == 0 and found2 == 0:
+            filtered_df = variation(self)
+            location = self.directory_code 
+            pop_word.create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+            word.acceptance_no_deficiencies(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+            
+        else:
+            print("got u again")
+            error_acceptance()
 
+    if self.getchoice.item == "Acceptance" and self.getchoice.item2 == "Warranty":
+        found = self.df[self.df['Warranty'].str.contains('Rejected')]
+        found2 = len(self.df[self.df['Warranty'] == '']) 
+        if len(found) == 0 and found2 == 0:
+            filtered_df = variation(self)
+            location = self.directory_code 
+            pop_word.create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+            word.acceptance_no_deficiencies(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+        else:
+            print("got u again")
+            error_acceptance()
+            
+
+    if self.getchoice.item == "Rejection" and self.getchoice.item2 == "Walkthrough":
+        found2 = len(self.df[self.df['Walkthrough'] == '']) 
+        if found2 == 0:
+            filtered_df = variation(self)
+            location = self.directory_code 
+            pop_word.create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+            word.rejected_word(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+        else:
+                print("got u again")
+                error_rejection()
+                pass
+
+    if self.getchoice.item == "Rejection" and self.getchoice.item2 == "Warranty":
+        found2 = len(self.df[self.df['Warranty'] == '']) 
+        if found2 == 0:
+            filtered_df = variation(self)
+            location = self.directory_code 
+            pop_word.create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+            word.rejected_word(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
+        else:
+                print("got u again")
+                error_rejection()
+                pass
+
+
+def variation(self):
+    
+    if self.code == 1:
+        if self.getchoice.item2 == "Walkthrough":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin([ "Notes.1", "Warranty"])]
+            return filtered_df
+        if self.getchoice.item2 == "Warranty":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Walkthrough", "Notes"])]
+            return filtered_df
+
+    if self.code == 2:
+        if self.getchoice.item2 == "Walkthrough":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin([ "Notes.1", "Warranty"])]
+            return filtered_df
+        if self.getchoice.item2 == "Warranty":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Walkthrough", "Notes"])]
+            return filtered_df
+    
+    if self.code == 3:
+        if self.getchoice.item2 == "Walkthrough":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin([ "Notes.1", "Warranty"])]
+            return filtered_df
+        if self.getchoice.item2 == "Warranty":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Walkthrough", "Notes"])]
+            return filtered_df
+
+    if self.code == 4:
+        if self.getchoice.item2 == "Walkthrough":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["OC Surveyor", "Notes.1", "Warranty", "Reviewer.1"])]
+            return filtered_df
+        if self.getchoice.item2 == "Warranty":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Walkthrough", "Notes", "Vendor Surveyor", "Reviewer"])]
+            return filtered_df
+
+    if self.code == 5:
+        if self.getchoice.item2 == "Walkthrough":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Notes.1", "Warranty"])]
+            return filtered_df
+        if self.getchoice.item2 == "Warranty":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Walkthrough", "Notes"])]
+            return filtered_df
+
+    if self.code == 6:
+        if self.getchoice.item2 == "Walkthrough":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Notes.1", "Warranty"])]
+            return filtered_df
+        if self.getchoice.item2 == "Warranty":
+            filtered_df = self.df.loc[:, ~self.df.columns.isin(["Walkthrough", "Notes"])]
+            return filtered_df
+    
 
 def showError():
     msgBox = QMessageBox()
     msgBox.setText("File Not Found")
     msgBox.setWindowTitle("Error")
     msgBox.exec()
+
+def error_acceptance():
+    msgBox = QMessageBox()
+    msgBox.setText("Rejection or empty space found when trying to send Acceptance Letter")
+    msgBox.setWindowTitle("Error")
+    msgBox.exec()
+
+def error_rejection():
+    msgBox = QMessageBox()
+    msgBox.setText(" Empty space found when trying to send Rejection Letter")
+    msgBox.setWindowTitle("Error")
+    msgBox.exec()
+
 
 
 def check_b4_save(self):

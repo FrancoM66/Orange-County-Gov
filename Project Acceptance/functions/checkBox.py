@@ -3,8 +3,7 @@ from PyQt6.QtWidgets import QMessageBox
 def check_work_area(self):
 
     pump_string = {'Pump', 'pump', 'pumpstation', 'PumpStation', 'Pumpstation'}
-    pressure_string = {"Pressure", "Pressurized",
-                       "Pressurized Pipe", "Pipe", "pressure", "pressurized"}
+    pressure_string = {"Pressure", "Pressurized","Pressurized Pipe", "Pipe", "pressure", "pressurized"}
     wastewater_string = {"Gravity", "gravity", "wastewater", "WasteWater"}
 
     work_entry_text = self.work_entry.text()
@@ -34,6 +33,7 @@ def check_work_area(self):
         showError()
         self.planfile_Btn.setEnabled(False)
         self.planfile_entry.setEnabled(False)
+        
 
 
 def showError():

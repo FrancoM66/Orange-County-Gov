@@ -1,14 +1,14 @@
 import os
 
 def check_path(concat):
-    if os.path.isdir(concat + "/" + "Pump Station"):
+    if os.path.isdir(concat + "/" + "Pump-Station"):
         print("we in pump")
         pump = 1
     else:
         print("pump folder not found")
         pump = 0
 
-    if os.path.isdir(concat + "/" + "Pressurized Pipe"):
+    if os.path.isdir(concat + "/" + "Pressurized-Pipe"):
         print("we in pressure")
         pressure = 1
     else:
@@ -22,4 +22,11 @@ def check_path(concat):
         print("gravity folder not found")
         gravity = 0
 
-    return pump, pressure, gravity
+    if os.path.isdir(concat + "/" + "Excel"):
+        print("we in Excel")
+        excel = 1
+    else:
+        print("Excel not found")
+        excel = 0
+
+    return pump, pressure, gravity, excel

@@ -1,13 +1,17 @@
 import os
 import functions.excel as excel
 import shutil
-from PyQt6.QtWidgets import QMessageBox, QInputDialog, QLineEdit
+import functions.word as word
+from PyQt6.QtWidgets import QMessageBox
+from PyQt6 import QtWidgets
+from functions.search import *
+
 
 def create_new(self):
         template = "O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\Templates"
         parent_dir = self.concat
         print("In create New " + parent_dir)
-
+        
         if self.pump_checkB.isChecked():
             if self.CIP_checkB.isChecked():
                 variation = "/Cip Pump.csv"
@@ -15,7 +19,7 @@ def create_new(self):
             elif self.development_checkB.isChecked():
                 variation = "/Development Pump.csv"
                 csv_tranfer = template + variation
-            self.directoryCode = "/Pump Station"
+            self.directoryCode = "/Pump-Station"
             path = parent_dir+ self.directoryCode
             os.mkdir(path) 
             excel.init_table(self, csv_tranfer, variation)
@@ -36,10 +40,9 @@ def create_new(self):
             self.planfile_Btn.setEnabled(False)
             self.add_row.setEnabled(True)
             self.del_row.setEnabled(True)
-            self.create_pdf.setEnabled(True)
+            self.send_to_sign.setEnabled(True)
             self.save_btn.setEnabled(True)
             create_successful(self)
- 
 
         elif self.gravity_checkB.isChecked():
             if self.CIP_checkB.isChecked():
@@ -67,7 +70,7 @@ def create_new(self):
             self.work_entry_Btn.setEnabled(False)
             self.planfile_Btn.setEnabled(False)
             self.add_row.setEnabled(True)
-            self.create_pdf.setEnabled(True)
+            self.send_to_sign.setEnabled(True)
             self.save_btn.setEnabled(True)
             self.del_row.setEnabled(True)
             create_successful(self)
@@ -79,7 +82,7 @@ def create_new(self):
             elif self.development_checkB.isChecked():
                 variation = "/Development Pressure.csv"
                 csv_tranfer = template + variation
-            self.directoryCode = "/Pressurized Pipe"
+            self.directoryCode = "/Pressurized-Pipe"
             path = parent_dir+ self.directoryCode
             os.mkdir(path) 
             excel.init_table(self, csv_tranfer, variation)
@@ -97,21 +100,44 @@ def create_new(self):
             self.work_entry_Btn.setEnabled(False)
             self.planfile_Btn.setEnabled(False)
             self.add_row.setEnabled(True)
-            self.create_pdf.setEnabled(True)
+            self.send_to_sign.setEnabled(True)
             self.save_btn.setEnabled(True)
             self.del_row.setEnabled(True)
             create_successful(self)
 
+        # first_time(self, path)
+
+# def first_time(self, path):
+#     msgBox = QMessageBox()
+#     msgBox.setText("Are all deficencies Accepted?")
+#     msgBox.setWindowTitle("Create Letter")
+#     msgBox.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+#     response = msgBox.exec()
+#     print(response)
+#     if self.pump_checkB.isChecked():
+#         active = "Pump-Station"
+
+#     elif self.gravity_checkB.isChecked():
+#         active = "Gravity"
+        
+#     elif self.pressure_checkB.isChecked():
+#         active = "Pressurized-Pipe"
+
+#     if self.CIP_checkB.isChecked():
+#         project = "CIP"
+
+#     if self.development_checkB.isChecked():
+#         project = "Dev"
+
+#     if response == QtWidgets.QMessageBox.StandardButton.Yes:
+#         print("We said yes")
+#         print(active)
+#         word.acceptance_no_deficiencies(self,active, project, path)
+#         return True
+        
+#     else:
+#         return False
     
-def create_planfile_folder(self,workOrder):
-    planfile_folder = "O:\Field Services Division\Field Support Center\Project Acceptance"
-    self.le = QLineEdit()
-    self.le.move(130, 22)
-    showDialog(self, workOrder)
-    self.setGeometry(300, 300, 300, 150)
-    self.setWindowTitle('Input Dialog')        
-    self.show()
-    pass
 
 def create_successful(self):
     msgBox = QMessageBox()
@@ -121,7 +147,4 @@ def create_successful(self):
     self.open_existing_Btn.setEnabled(True)
     msgBox.exec()
 
-def showDialog(self, workOrder):
-        text, ok = QInputDialog.getText(self, 'input dialog', workOrder + '- ')
-        if ok:
-            self.le.setText(str(text))
+
