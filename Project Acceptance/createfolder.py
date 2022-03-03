@@ -1,11 +1,7 @@
 import os
-import functions.excel as excel
+from excel_create import *
 import shutil
-import functions.word as word
 from PyQt6.QtWidgets import QMessageBox
-from PyQt6 import QtWidgets
-from functions.search import *
-
 
 def create_new(self):
         template = "O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\Templates"
@@ -22,7 +18,7 @@ def create_new(self):
             self.directoryCode = "/Pump-Station"
             path = parent_dir+ self.directoryCode
             os.mkdir(path) 
-            excel.init_table(self, csv_tranfer, variation)
+            init_table(self, csv_tranfer, variation)
             print("Directory '% s' created" % self.directoryCode) 
             print(path)
             original = template + "/Cip Pump.csv"
@@ -55,7 +51,7 @@ def create_new(self):
             path = parent_dir+ self.directoryCode
             print(path)
             os.mkdir(path) 
-            excel.init_table(self, csv_tranfer, variation)
+            init_table(self, csv_tranfer, variation)
             print("Directory '% s' created" % self.directoryCode) 
             original = template + "/Cip Gravity.csv"
             target = parent_dir + "/Excel" + "/Cip Gravity.csv"
@@ -85,7 +81,7 @@ def create_new(self):
             self.directoryCode = "/Pressurized-Pipe"
             path = parent_dir+ self.directoryCode
             os.mkdir(path) 
-            excel.init_table(self, csv_tranfer, variation)
+            init_table(self, csv_tranfer, variation)
             print("Directory '% s' created" % self.directoryCode) 
             original = template + "/Cip Pressure.csv"
             target = parent_dir + "/Excel" + "/Cip Pressure.csv"
@@ -105,42 +101,10 @@ def create_new(self):
             self.del_row.setEnabled(True)
             create_successful(self)
 
-        # first_time(self, path)
-
-# def first_time(self, path):
-#     msgBox = QMessageBox()
-#     msgBox.setText("Are all deficencies Accepted?")
-#     msgBox.setWindowTitle("Create Letter")
-#     msgBox.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
-#     response = msgBox.exec()
-#     print(response)
-#     if self.pump_checkB.isChecked():
-#         active = "Pump-Station"
-
-#     elif self.gravity_checkB.isChecked():
-#         active = "Gravity"
-        
-#     elif self.pressure_checkB.isChecked():
-#         active = "Pressurized-Pipe"
-
-#     if self.CIP_checkB.isChecked():
-#         project = "CIP"
-
-#     if self.development_checkB.isChecked():
-#         project = "Dev"
-
-#     if response == QtWidgets.QMessageBox.StandardButton.Yes:
-#         print("We said yes")
-#         print(active)
-#         word.acceptance_no_deficiencies(self,active, project, path)
-#         return True
-        
-#     else:
-#         return False
-    
 
 def create_successful(self):
     msgBox = QMessageBox()
+    msgBox.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
     msgBox.setText("You created " + self.directoryCode)
     msgBox.setWindowTitle("Successful")
     self.create_new_Btn.setEnabled(False)

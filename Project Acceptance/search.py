@@ -1,11 +1,8 @@
 import os
-import re
-import glob
-from functions.checkpath import *
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6 import QtWidgets
-from functions.createfolder import *
-from functions.mail import mail_signed
+from checkpath import * 
+from PyQt6 import QtGui
 
 def search_clicked(self):
     path = "O:\Field Services Division\Field Support Center\Project Acceptance"
@@ -48,6 +45,7 @@ def search_clicked(self):
 
 def showError():
     msgBox = QMessageBox()
+    msgBox.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
     msgBox.setText("Please Enter Valid Entry")
     msgBox.setWindowTitle("Error")
     msgBox.exec()
@@ -57,6 +55,7 @@ def createNew(self):
     self.isFirst = True
     print("in createNew: " + str(self.isFirst))
     msgBox = QMessageBox()
+    msgBox.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
     msgBox.setText("Folder not found. Create new folder with this planfile?")
     msgBox.setWindowTitle("Create new folder")
     msgBox.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel)

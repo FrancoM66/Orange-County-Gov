@@ -1,13 +1,17 @@
+#!/usr/bin/env python3
+
 from PyQt6 import QtCore, QtGui, QtWidgets
 import ctypes
-import functions.checkBox as checkBox
-import functions.search as search
-import functions.excel as excel
-import functions.createfolder as createfolder
+import checkBox as checkBox
+from search import *
+from excel_create import *
+from createfolder import *
+from checkBox import *
 
 class UI_Main_Window(object):
 
-    def setup_GUI(self, MainWindow):
+    def __init__(self, MainWindow):
+        super().__init__()
         # checking screen size
         user32 = ctypes.windll.user32
         screen_size_x = user32.GetSystemMetrics(0)
@@ -20,7 +24,8 @@ class UI_Main_Window(object):
         MainWindow.setObjectName("Excel Exterminator")
         MainWindow.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         MainWindow.setEnabled(True)
-        MainWindow.resize(screen_size_x - 10, screen_size_y)
+        MainWindow.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
+        MainWindow.resize(int(screen_size_x) - 10, int(screen_size_y))
 
         # creating central widget
         self.central_widget =  QtWidgets.QWidget(MainWindow)
@@ -165,82 +170,82 @@ class UI_Main_Window(object):
 
         # tableview
         self.tableview = QtWidgets.QTableView(self.central_widget)
-        self.tableview.setGeometry(QtCore.QRect(190, 10, screen_size_x - 225, screen_size_y - 100))  # custom
+        self.tableview.setGeometry(QtCore.QRect(190, 10, int(screen_size_x) - 225, int(screen_size_y) - 100))  # custom
         self.tableview.setObjectName("tableView")
 
         # open existing button
         self.open_existing_Btn = QtWidgets.QPushButton(self.options_pane)
         self.open_existing_Btn.setEnabled(False)
-        self.open_existing_Btn.setGeometry(QtCore.QRect(30, 40, 91, 24))
+        self.open_existing_Btn.setGeometry(QtCore.QRect(20, 40, 113, 24))
         self.open_existing_Btn.setObjectName("open_existing_Btn")
+
+        # create new button
+        self.create_new_Btn = QtWidgets.QPushButton(self.options_pane)
+        self.create_new_Btn.setEnabled(False)
+        self.create_new_Btn.setGeometry(QtCore.QRect(20, 70, 113, 24))
+        self.create_new_Btn.setObjectName("create_new_Btn")
 
         # add row button
         self.add_row = QtWidgets.QPushButton(self.options_pane)
         self.add_row.setEnabled(False)
-        self.add_row.setGeometry(QtCore.QRect(30, 160, 91, 24))
+        self.add_row.setGeometry(QtCore.QRect(20, 100, 113, 24))
         self.add_row.setObjectName("add_row")
 
         # delete row button
         self.del_row = QtWidgets.QPushButton(self.options_pane)
         self.del_row.setEnabled(False)
-        self.del_row.setGeometry(QtCore.QRect(30, 190, 91, 24))
+        self.del_row.setGeometry(QtCore.QRect(20, 130, 113, 24))
         self.del_row.setObjectName("del_row")
-
-        # create new button
-        self.create_new_Btn = QtWidgets.QPushButton(self.options_pane)
-        self.create_new_Btn.setEnabled(False)
-        self.create_new_Btn.setGeometry(QtCore.QRect(30, 70, 91, 24))
-        self.create_new_Btn.setObjectName("create_new_Btn")
 
         # send to sign button
         self.send_to_sign = QtWidgets.QPushButton(self.options_pane)
         self.send_to_sign.setEnabled(False)
-        self.send_to_sign.setGeometry(QtCore.QRect(30, 100, 91, 24))
+        self.send_to_sign.setGeometry(QtCore.QRect(20, 190, 113, 24))
         self.send_to_sign.setObjectName("send_to_sign")
 
         # save excel button
         self.save_btn = QtWidgets.QPushButton(self.options_pane)
         self.save_btn.setEnabled(False)
-        self.save_btn.setGeometry(QtCore.QRect(30, 130, 91, 24))
+        self.save_btn.setGeometry(QtCore.QRect(20, 160, 113, 24))
         self.save_btn.setObjectName("save_btn")
 
         # reset button
         self.reset_btn = QtWidgets.QPushButton(self.options_pane)
         self.reset_btn.setEnabled(True)
-        self.reset_btn.setGeometry(QtCore.QRect(30, 250, 91, 24))
+        self.reset_btn.setGeometry(QtCore.QRect(20, 250, 113, 24))
         self.reset_btn.setObjectName("reset_btn")
 
-        # warranty all accepted button
-        self.warranty_btn = QtWidgets.QPushButton(self.options_pane)
-        self.warranty_btn.setEnabled(True)
-        self.warranty_btn.setGeometry(QtCore.QRect(30, 220, 91, 24))
-        self.warranty_btn.setObjectName("warranty_btn")
+        # send signed  button
+        self.send_signed = QtWidgets.QPushButton(self.options_pane)
+        self.send_signed.setEnabled(False)
+        self.send_signed.setGeometry(QtCore.QRect(20, 220, 113, 24))
+        self.send_signed.setObjectName("send_signed")
 
         # Picture
         label = QtWidgets.QLabel(self.central_widget)
-        pixmap = QtGui.QPixmap('imgs/OCULogo.jpg')
+        pixmap = QtGui.QPixmap('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/OCULogo.jpg')
         label.setPixmap(pixmap)
-        xpos = screen_size_x - 225
-        label.setGeometry(QtCore.QRect(xpos/2 -100, 10, screen_size_x - 225, screen_size_y - 100))
+        xpos = int(screen_size_x) - 225
+        label.setGeometry(QtCore.QRect(int(xpos/2) - 100, 10, int(screen_size_x) - 225, int(screen_size_y) - 100))
         
         # setting names for the labels
         self.retranslateUi(MainWindow)
         self.isFirst = False
 
         # button clicked Functions              
-        self.planfile_Btn.clicked.connect(lambda: search.search_clicked(self)) 
-        self.open_existing_Btn.clicked.connect(lambda: excel.init_table(self,"",""))
-        self.add_row.clicked.connect(lambda: excel.add_rows(self,self.tableview))
-        self.del_row.clicked.connect(lambda: excel.remove_row(self,self.tableview))
+        self.planfile_Btn.clicked.connect(lambda: search_clicked(self)) 
+        self.open_existing_Btn.clicked.connect(lambda: init_table(self,"",""))
+        self.add_row.clicked.connect(lambda: add_rows(self,self.tableview))
+        self.del_row.clicked.connect(lambda: remove_row(self,self.tableview))
     
-        self.warranty_btn.clicked.connect(lambda: excel.send(self))
+        self.send_signed.clicked.connect(lambda: send(self))
         
-        self.create_new_Btn.clicked.connect(lambda: search.search_clicked(self))
-        self.create_new_Btn.clicked.connect(lambda: createfolder.create_new(self))
-        self.send_to_sign.clicked.connect(lambda: excel.pandas2word(self))
-        self.save_btn.clicked.connect(lambda: excel.check_b4_save(self))
+        self.create_new_Btn.clicked.connect(lambda: search_clicked(self))
+        self.create_new_Btn.clicked.connect(lambda: create_new(self))
+        self.send_to_sign.clicked.connect(lambda: pandas2word(self))
+        self.save_btn.clicked.connect(lambda: check_b4_save(self))
         self.reset_btn.clicked.connect(lambda: self.reset_all())
-        self.work_entry_Btn.clicked.connect(lambda: checkBox.check_work_area(self))
+        self.work_entry_Btn.clicked.connect(lambda:check_work_area(self))
 
         self.open_existing_Btn.clicked.connect(lambda:self.reset_btn.setEnabled(False))
         self.open_existing_Btn.clicked.connect(lambda:self.work_entry_Btn.setEnabled(False))
@@ -259,7 +264,7 @@ class UI_Main_Window(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Project Acceptance"))
         self.planfile_label.setText(_translate("MainWindow", "Plan File #"))
         self.planfile_Btn.setText(_translate("MainWindow", "Enter"))
         self.open_folder_label.setText(_translate("MainWindow", "Active Category"))
@@ -271,12 +276,12 @@ class UI_Main_Window(object):
         self.add_row.setText(_translate("MainWindow", "Add Row"))
         self.del_row.setText(_translate("MainWindow", "Delete Row"))
         self.create_new_Btn.setText(_translate("MainWindow", "Create New"))
-        self.send_to_sign.setText(_translate("MainWindow", "Send"))
+        self.send_to_sign.setText(_translate("MainWindow", "Send for Signature"))
         self.save_btn.setText(_translate("MainWindow", "Save Changes"))
         self.reset_btn.setText(_translate("MainWindow", "Reset All Fields"))
         self.work_area_label.setText(_translate("MainWindow", "Work Area"))
         self.work_entry_Btn.setText(_translate("MainWindow", "Enter"))
-        self.warranty_btn.setText(_translate("MainWindow", "Send Signed"))
+        self.send_signed.setText(_translate("MainWindow", "Send Signed"))
         self.Dev_or_CIP_label.setText(_translate("MainWindow", "Development or CIP"))
         self.development_checkB.setText(_translate("MainWindow", "Development"))
         self.CIP_checkB.setText(_translate("MainWindow", "CIP"))
@@ -300,20 +305,20 @@ class UI_Main_Window(object):
 
             self.open_existing_Btn.setEnabled(True)
             self.create_new_Btn.setEnabled(False)
-            self.warranty_btn.setEnabled(True)
+            self.send_signed.setEnabled(True)
             
 
         elif self.gravity_checkB.isChecked() and self.gravity_folder.isChecked():
             self.open_existing_Btn.setEnabled(True)
             self.create_new_Btn.setEnabled(False)
-            self.warranty_btn.setEnabled(True)
+            self.send_signed.setEnabled(True)
             
 
         elif self.pressure_checkB.isChecked() and self.pressure_folder.isChecked():
 
             self.open_existing_Btn.setEnabled(True)
             self.create_new_Btn.setEnabled(False)
-            self.warranty_btn.setEnabled(True)
+            self.send_signed.setEnabled(True)
 
 
         else:
@@ -347,17 +352,15 @@ class UI_Main_Window(object):
         self.gravity_folder.setChecked(False)
         self.pressure_folder.setChecked(False)
 
-def main():
+
+if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle('Fusion')
     MainWindow = QtWidgets.QMainWindow()
-    ui = UI_Main_Window()
-    ui.setup_GUI(MainWindow)
+    ui = UI_Main_Window(MainWindow)
+    ui.__init__(MainWindow)
+    MainWindow.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
 
     MainWindow.show()
     sys.exit(app.exec())
-
-            
-if __name__ == "__main__":
-    main()

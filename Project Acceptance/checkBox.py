@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QMessageBox
+from PyQt6 import QtGui
 
 def check_work_area(self):
 
@@ -38,6 +39,7 @@ def check_work_area(self):
 
 def showError():
     msgBox = QMessageBox()
+    msgBox.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
     msgBox.setText("Please Enter Valid Entry")
     msgBox.setWindowTitle("Error")
     msgBox.exec()
