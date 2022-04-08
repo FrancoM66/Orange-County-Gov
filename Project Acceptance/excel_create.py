@@ -1,13 +1,15 @@
+from codecs import ignore_errors
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import QAbstractTableModel, QModelIndex,Qt
-from PyQt6.QtWidgets import QComboBox, QItemDelegate,QMessageBox,QInputDialog,QWidget,QHeaderView
+from PyQt6.QtWidgets import QComboBox, QItemDelegate,QMessageBox,QInputDialog,QWidget
 import pandas as pd
 import configparser
 import json
 from word_create import *
 from mail import *
 from docx_create import *
+from search import *
 
 # Creates the model for the QTableView
 class PandasModel(QAbstractTableModel):
@@ -155,11 +157,8 @@ def filename_checker(self):
         self.excel_filename = self.concat + "/Excel/" + self.filename
 
 class App(QWidget):
-    global acceptedorrejected
-    global walkthroughorwarranty
-    global workorder
-
-    def __init__(self):
+    
+    def __init__(self, workOrder):
         super().__init__()
         self.title = 'popup'
         self.left = 10
@@ -167,35 +166,38 @@ class App(QWidget):
         self.width = 640
         self.height = 480
         self.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
+        self.workOrder = workOrder
+        print(self.workOrder + " Inside the init")
         self.initUI()
     
     def initUI(self):
-        # self.setWindowTitle(self.title)
-        # self.setGeometry(self.left, self.top, self.width, self.height)
-        # self.center()
-
         self.getChoice()
         self.getText()
-        
-        # self.show()
 
     def getChoice(self):
+
+        config = configparser.RawConfigParser()
+        config.read("O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\config\emailCC.properties")
+        inspectors = config.get("INSPECTORS", "inspectorList")
+        inspectorList = json.loads(inspectors)
+
+        chiefInspector = config.get("INSPECTORS", "chief_inspectors")
+        chiefInspectorList = json.loads(chiefInspector)
+
         accepted_rejected = ("","Acceptance","Rejection")
         walkthrough_warranty = ("Walkthrough","Warranty")
         self.item2, okPressed = QInputDialog.getItem(self, " ","Walkthrough or Warranty:", walkthrough_warranty, 0, False)
         self.item, okPressed = QInputDialog.getItem(self, " ","Accepted or Rejected:", accepted_rejected, 0, False)
-        if okPressed and self.item and self.item2:
-            print(self.item)
-            print(self.item2)
+        self.inspector, okPressed = QInputDialog.getItem(self, " ","Choose an inspector:", inspectorList, 0, False)
+        self.chiefInspector, okPressed = QInputDialog.getItem(self, " ","Choose an inspector:", chiefInspectorList, 0, False)
+        create_info(self.workOrder,"",self.inspector)
 
     def getText(self):
         self.text, okPressed = QInputDialog.getText(self, " ","Please Enter Inspection Date mm-dd-yyyy:",  QtWidgets.QLineEdit.EchoMode.Normal, "")
-        if okPressed and self.text != '':
-            print(self.text)
 
         self.text2, okPressed = QInputDialog.getText(self, " ","Please Enter Refrence Work Order:",  QtWidgets.QLineEdit.EchoMode.Normal, "")
-        if okPressed and self.text2 != '':
-            print(self.text)
+
+    
 
     def center(self):
         qr = self.frameGeometry()
@@ -205,15 +207,11 @@ class App(QWidget):
 
 def send(self):
     filename_checker(self)
-    print(self.directory_code)
-    mail_signed(self,self.directory_code)
+    workOrder_pf = self.planfile_entry.text()
+    mail_signed(self,self.directory_code, workOrder_pf)
 
 # Initialized the table
 def init_table(self,template, variation):
-
-    # for proc in psutil.process_iter():
-    #     if proc.name() == "excel.exe":
-    #         proc.kill()
 
     filename_checker(self)
 
@@ -223,10 +221,9 @@ def init_table(self,template, variation):
     else:
         self.variation1 = "/"+ self.filename
     
-    
-    print("in excel.py")
-    print(self.excel_filename)
     self.df = pd.read_csv(self.excel_filename)
+    self.df = self.df.fillna("N/A")
+    
     if self.df.size == 0:
         return
 
@@ -236,11 +233,8 @@ def init_table(self,template, variation):
     self.model = PandasModel(self.df)
 
     self.tableview.setModel(self.model)
-    # self.tableview.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-    # self.tableview.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
     self.tableview.setWordWrap(True)
-    # self.tableview.resizeRowsToContents()
-    self.tableview.resizeColumnsToContents()
+    self.tableview.horizontalHeader().setStretchLastSection(True)
     
     self.tableview.show()
 
@@ -248,7 +242,8 @@ def init_table(self,template, variation):
 def add_rows(self, table):
     df2 = {'Warranty': ''}
     self.df = self.df.append(df2, ignore_index = True)
-    
+    self.df = self.df.fillna("N/A")
+
     self.model = PandasModel(self.df)
 
     set_delegates(self, table)
@@ -257,10 +252,29 @@ def add_rows(self, table):
     
     table.show()
 
+def import_from_book(self,table):
+    file_name = QtWidgets.QFileDialog.getOpenFileName(None, "Select Directory")
+    if(file_name == ""):
+        return
+    else:
+
+        df_to_merge = pd.read_csv(file_name[0],skiprows=9)
+        
+        for x in range(df_to_merge.shape[1]):
+            self.df["Location"] = pd.concat([df_to_merge["test"].dropna(),self.df["Location"]], ignore_index=True)
+
+        self.model = PandasModel(self.df)
+
+        set_delegates(self, table)
+
+        table.setModel(self.model)
+        
+        table.show()
+
+
 def remove_row(self, table):
     x = table.selectionModel().currentIndex()
     NewIndex = x.row()
-    print("This is the Index: ", NewIndex)
     new_model = self.df.drop(self.df.index[NewIndex])
     self.model = PandasModel(new_model)
 
@@ -331,7 +345,6 @@ def set_delegates(self, table):
         table.setItemDelegateForColumn(9, reviewer_delegate)
         table.setItemDelegateForColumn(10, corrective_delegate)
         table.setItemDelegateForColumn(12, options_delegate)
-        # table.setItemDelegateForColumn(14, vendor)
         table.setItemDelegateForColumn(14, reviewer_delegate)
         table.setItemDelegateForColumn(15, corrective_delegate)
 
@@ -372,20 +385,20 @@ def exportToExcel(self, table):
             dfnew.at[row, columnHeaders[col]] = setter.model().index(row, col).data()
     
     dfnew.to_csv(self.concat + "/Excel" + self.variation1, index=False)
-    print('Excel file exported')
 
 
 def pandas2word(self):
-    self.getchoice = App()
+    workOrder_pf = self.planfile_entry.text()
+    self.getchoice = App(workOrder_pf)
     
     if self.getchoice.item == "Acceptance" and self.getchoice.item2 == "Walkthrough":
         found = self.df[self.df['Walkthrough'].str.contains('Rejected')]
-        found2 = len(self.df[self.df['Walkthrough'] == 'nan']) 
+        found2 = len(self.df[self.df['Walkthrough'] == 'N/A']) 
         if len(found) == 0 and found2 == 0:
             filtered_df = variation(self)
             location = self.directory_code 
-            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
-            acceptance_no_deficiencies(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2)
+            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.chiefInspector)
+            acceptance_no_deficiencies(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2, workOrder_pf)
             
         else:
             print("got u again")
@@ -393,36 +406,36 @@ def pandas2word(self):
 
     if self.getchoice.item == "Acceptance" and self.getchoice.item2 == "Warranty":
         found = self.df[self.df['Warranty'].str.contains('Rejected')]
-        found2 = len(self.df[self.df['Warranty'] == 'nan']) 
+        found2 = len(self.df[self.df['Warranty'] == 'N/A']) 
         if len(found) == 0 and found2 == 0:
             filtered_df = variation(self)
             location = self.directory_code 
-            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
-            acceptance_no_deficiencies(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2)
+            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.chiefInspector)
+            acceptance_no_deficiencies(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2, workOrder_pf)
         else:
             print("got u again")
             error_acceptance()
             
 
     if self.getchoice.item == "Rejection" and self.getchoice.item2 == "Walkthrough":
-        found2 = len(self.df[self.df['Walkthrough'] == 'nan']) 
+        found2 = len(self.df[self.df['Walkthrough'] == 'N/A']) 
         if found2 == 0:
             filtered_df = variation(self)
             location = self.directory_code 
-            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
-            rejected_word(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2)
+            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.chiefInspector)
+            rejected_word(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2, workOrder_pf)
         else:
                 print("got u again")
                 error_rejection()
                 pass
 
     if self.getchoice.item == "Rejection" and self.getchoice.item2 == "Warranty":
-        found2 = len(self.df[self.df['Warranty'] == 'nan']) 
+        found2 = len(self.df[self.df['Warranty'] == 'N/A']) 
         if found2 == 0:
             filtered_df = variation(self)
             location = self.directory_code 
-            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item)
-            rejected_word(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2)
+            create_word(self, filtered_df, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.chiefInspector)
+            rejected_word(self, self.area, self.cip_dev, location,self.getchoice.text, self.getchoice.item2, self.getchoice.item,self.getchoice.text2, workOrder_pf)
         else:
                 print("got u again")
                 error_rejection()

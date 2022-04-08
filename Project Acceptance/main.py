@@ -221,6 +221,11 @@ class UI_Main_Window(object):
         self.send_signed.setGeometry(QtCore.QRect(20, 220, 113, 24))
         self.send_signed.setObjectName("send_signed")
 
+        self.import_csv = QtWidgets.QPushButton(self.options_pane)
+        self.import_csv.setEnabled(False)
+        self.import_csv.setGeometry(QtCore.QRect(20, 280, 113, 24))
+        self.import_csv.setObjectName("send_signed")
+
         # Picture
         label = QtWidgets.QLabel(self.central_widget)
         pixmap = QtGui.QPixmap('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/OCULogo.jpg')
@@ -239,10 +244,12 @@ class UI_Main_Window(object):
         self.del_row.clicked.connect(lambda: remove_row(self,self.tableview))
     
         self.send_signed.clicked.connect(lambda: send(self))
+        self.import_csv.clicked.connect(lambda: import_from_book(self,self.tableview))
         
         self.create_new_Btn.clicked.connect(lambda: search_clicked(self))
         self.create_new_Btn.clicked.connect(lambda: create_new(self))
         self.send_to_sign.clicked.connect(lambda: pandas2word(self))
+        self.send_to_sign.clicked.connect(lambda: self.send_signed.setEnabled(True))
         self.save_btn.clicked.connect(lambda: check_b4_save(self))
         self.reset_btn.clicked.connect(lambda: self.reset_all())
         self.work_entry_Btn.clicked.connect(lambda:check_work_area(self))
@@ -285,6 +292,7 @@ class UI_Main_Window(object):
         self.Dev_or_CIP_label.setText(_translate("MainWindow", "Development or CIP"))
         self.development_checkB.setText(_translate("MainWindow", "Development"))
         self.CIP_checkB.setText(_translate("MainWindow", "CIP"))
+        self.import_csv.setText(_translate("MainWindow", "Import CSV from WB"))
         self.active_folder_label.setText(_translate("MainWindow", "Folders Found"))
         self.pump_folder.setText(_translate("MainWindow", "Pump"))
         self.pressure_folder.setText(_translate("MainWindow", "Pressure"))

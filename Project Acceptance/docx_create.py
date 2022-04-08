@@ -5,12 +5,30 @@ from docx.shared import Inches
 from win32com import client
 from mailmerge import MailMerge
 
-def create_word(self, df, variation, project, path, date, item, item2):
+def create_word(self, df, variation, project, path, date, item, item2,chiefinspector):
     original = r"O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\Temp\Asset List Temp.docx"
     original_temp = r"O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\Temp\asset_temp.docx"
 
     filepath = path + "/{0}-{1}-{2}-{3}-{4} (Asset List).docx".format(variation,date, project, item, self.planfile_entry.text())
-    pdf_path = path + "//{0}-{1}-{2}-{3}-{4}(Asset List).pdf".format(variation,date, project, item, self.planfile_entry.text())
+    pdf_path = path + "/{0}-{1}-{2}-{3}-{4}(Asset List).pdf".format(variation,date, project, item, self.planfile_entry.text())
+
+    path_2 = r"O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\info"
+    filename = self.planfile_entry.text() + ".txt"
+
+    f = open(path_2 + "/" + filename, "r")
+    f1 = f.readlines()
+    print(f1)
+    print(f1[0])
+
+    replaced = f1[2].strip()
+    replaced = replaced.replace(".", " ")
+    replaced = replaced.replace("1", "")
+    replaced = replaced.replace("2", "")
+    replaced = replaced.replace("3", "")
+    replaced = replaced.replace("4", "")
+    replaced = replaced.replace("5", "")
+    replaced = replaced.replace("6", "")
+
     # Open Microsoft Excel
     doc = Document(original)
     
@@ -59,7 +77,7 @@ def create_word(self, df, variation, project, path, date, item, item2):
 
     mergedoc = MailMerge(original_temp)
     print(mergedoc.get_merge_fields())
-    mergedoc.merge(Sequence = self.planfile_entry.text())
+    mergedoc.merge(Sequence = self.planfile_entry.text(), Inspector = replaced,OC = f1[1].strip(),Project = f1[0].strip(), Chief_Inspector = chiefinspector)
     mergedoc.write(filepath)
     mergedoc.close()
 
