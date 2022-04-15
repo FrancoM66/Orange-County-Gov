@@ -20,23 +20,8 @@ class App(QWidget):
         self.initUI()
     
     def initUI(self):
-        # self.setWindowTitle(self.title)
-        # self.setGeometry(self.left, self.top, self.width, self.height)
-        # self.center()
-
-        # self.getChoice()
         self.getText()
         
-        # self.show()
-
-    # def getChoice(self):
-    #     name_folder = ("","Acceptance","Rejection")
-    #     walkthrough_warranty = ("Walkthrough","Warranty")
-    #     self.item2, okPressed = QInputDialog.getItem(self, " ","Walkthrough or Warranty:", walkthrough_warranty, 0, False)
-    #     self.item, okPressed = QInputDialog.getItem(self, " ","Accepted or Rejected:", accepted_rejected, 0, False)
-    #     if okPressed and self.item and self.item2:
-    #         print(self.item)
-    #         print(self.item2)
 
     def getText(self):
         self.projectname, okPressed = QInputDialog.getText(self, " ","Project Name:",  QtWidgets.QLineEdit.EchoMode.Normal, "")

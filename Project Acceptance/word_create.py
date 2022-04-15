@@ -48,7 +48,8 @@ def acceptance_no_deficiencies(self,variation, project, path, date, item, item2,
         ccListForMerge = ccListForMerge + emailCCList[i] + "\n"
         
         print(ccListForMerge)
-        
+    
+    ccListForMerge = ccListForMerge + replaced + ", Utilities Inspector, Utilities Field Services Division"
 
     document.merge(EmailToCC = ccListForMerge, Inspector = replaced, Project_Name = f1[0].strip(), OCNumber = f1[1].strip(),Date = today.strftime("%B %d, %G"),Inspection_Date = date, Sequence = self.planfile_entry.text(), Body = body_text, Work_Order = text2 )
     file_path = path + "/{0}-{1}-{2}-{3}-{4} (Letter).docx".format(variation,date, project, item, item2)
@@ -112,8 +113,10 @@ def rejected_word(self,variation, project, path, date, item, item2, text2, workO
     replaced = replaced.replace("4", "")
     replaced = replaced.replace("5", "")
     replaced = replaced.replace("6", "")
+
+    ccListForMerge = ccListForMerge + replaced + ", Utilities Inspector, Utilities Field Services Division"
     
-    body_text = "Defeciencies were found. Please see attached."
+    body_text = "Deficiencies were found. Please see attached."
     print(document.get_merge_fields())
     print(emailCCList)
     document.merge(EmailToCC = ccListForMerge,Inspector = replaced, Project_Name = f1[0].strip(), OCNumber = f1[1].strip(),Date = today.strftime("%B %d, %G"),Inspection_Date = date, Sequence = self.planfile_entry.text(), Body = body_text, Work_Order = text2 )

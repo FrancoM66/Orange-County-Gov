@@ -25,21 +25,21 @@ def mail_to_sign(self, path, listpath, filename, AorR, workOrder, project_name,v
 
         pipeSendTo = config.get("PRESSURE", "send4sign")
         pipelist = json.loads(pipeSendTo)
-        mailItem.HTMLBody = "<p>Mr.Rivera <br><br> Please sign and save the inspection letter using the following links: <br></p><a href='{0}'>{1}</a><br><p>Asset List:</p><a href='{2}'>{3}</a><br><ul><li>Project Name : {4}</li><li>Sequence Number: {5}</li></ul>".format(path, path,latest_file_list,latest_file_list,project_name,workOrder)
+        mailItem.HTMLBody = "<p>Mr. Rivera <br><br> Please sign and save the inspection letter using the following links: <br></p><a href='{0}'>{1}</a><br><p>Asset List:</p><a href='{2}'>{3}</a><br><ul><li>Project Name : {4}</li><li>Sequence Number: {5}</li></ul>".format(path, path,latest_file_list,latest_file_list,project_name,workOrder)
         mailItem.To = pipelist[0]
 
     elif(variation == "Gravity"):
 
         gravitySendTo = config.get("GRAVITY", "send4sign")
         gravitylist = json.loads(gravitySendTo)
-        mailItem.HTMLBody = "<p>Mr.Reyes <br><br> Please sign and save the inspection letter using the following links: <br></p><a href='{0}'>{1}</a><br><p>Asset List:</p><a href='{2}'>{3}</a><br><ul><li>Project Name : {4}</li><li>Sequence Number: {5}</li></ul>".format(path, path,latest_file_list,latest_file_list,project_name,workOrder)
+        mailItem.HTMLBody = "<p>Mr. Reyes <br><br> Please sign and save the inspection letter using the following links: <br></p><a href='{0}'>{1}</a><br><p>Asset List:</p><a href='{2}'>{3}</a><br><ul><li>Project Name : {4}</li><li>Sequence Number: {5}</li></ul>".format(path, path,latest_file_list,latest_file_list,project_name,workOrder)
         mailItem.To = gravitylist[0]
         
     elif(variation == "Pump-Station"):
 
         pumpSendTo = config.get("PUMP", "send4sign")
         pumplist = json.loads(pumpSendTo)
-        mailItem.HTMLBody = "<p>Mr.Brown <br><br> Please sign and save the inspection letter using the following links: <br></p><a href='{0}'>{1}</a><br><p>Asset List:</p><a href='{2}'>{3}</a><br><ul><li>Project Name : {4}</li><li>Sequence Number: {5}</li></ul>".format(path, path,latest_file_list,latest_file_list,project_name,workOrder)
+        mailItem.HTMLBody = "<p>Mr. Brown <br><br> Please sign and save the inspection letter using the following links: <br></p><a href='{0}'>{1}</a><br><p>Asset List:</p><a href='{2}'>{3}</a><br><ul><li>Project Name : {4}</li><li>Sequence Number: {5}</li></ul>".format(path, path,latest_file_list,latest_file_list,project_name,workOrder)
         mailItem.To = pumplist[0]
         
     mailItem.Sensitivity  = 2
@@ -95,7 +95,7 @@ def mail_signed(self, path, workOrder):
 
     # construct email item object
     mailItem = olApp.CreateItem(0)
-    mailItem.Subject = self.cip_dev + "-" + walkorwar + " Inspection-" + f1[0].strip() + "- " + f1[1].strip()
+    mailItem.Subject = self.cip_dev + "-" + walkorwar + " Inspection-" + f1[0].strip() + "- " + self.planfile_entry.text()+ "- "+ f1[1].strip()
     mailItem.BodyFormat = 1
     
     if(self.area == "Pressurized-Pipe" and isPublicWorks == True and self.cip_dev == "Dev"):

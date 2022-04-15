@@ -1,4 +1,3 @@
-from codecs import ignore_errors
 from PyQt6 import QtGui
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import QAbstractTableModel, QModelIndex,Qt
@@ -197,6 +196,24 @@ class App(QWidget):
 
         self.text2, okPressed = QInputDialog.getText(self, " ","Please Enter Refrence Work Order:",  QtWidgets.QLineEdit.EchoMode.Normal, "")
 
+class App_Count(QWidget):
+    
+    def __init__(self):
+        super().__init__()
+        self.title = 'popup'
+        self.left = 10
+        self.top = 10
+        self.width = 640
+        self.height = 480
+        self.setWindowIcon(QtGui.QIcon('O:\Field Services Division\Field Support Center\Project Acceptance\PA Excel Exterminator\imgs/Logo.jpg'))
+        self.initUI()
+    
+    def initUI(self):
+        self.getText()
+
+    def getText(self):
+        self.colcount, okPressed = QInputDialog.getText(self, " ","Please enter the number of rows to import (Total # Rows in CSV)",  QtWidgets.QLineEdit.EchoMode.Normal, "")
+
     
 
     def center(self):
@@ -251,25 +268,6 @@ def add_rows(self, table):
     table.setModel(self.model)
     
     table.show()
-
-def import_from_book(self,table):
-    file_name = QtWidgets.QFileDialog.getOpenFileName(None, "Select Directory")
-    if(file_name == ""):
-        return
-    else:
-
-        df_to_merge = pd.read_csv(file_name[0],skiprows=9)
-        
-        for x in range(df_to_merge.shape[1]):
-            self.df["Location"] = pd.concat([df_to_merge["test"].dropna(),self.df["Location"]], ignore_index=True)
-
-        self.model = PandasModel(self.df)
-
-        set_delegates(self, table)
-
-        table.setModel(self.model)
-        
-        table.show()
 
 
 def remove_row(self, table):
@@ -385,6 +383,7 @@ def exportToExcel(self, table):
             dfnew.at[row, columnHeaders[col]] = setter.model().index(row, col).data()
     
     dfnew.to_csv(self.concat + "/Excel" + self.variation1, index=False)
+    
 
 
 def pandas2word(self):
@@ -442,6 +441,27 @@ def pandas2word(self):
 
                 pass
 
+def import_from_book(self, table):
+    file_name = QtWidgets.QFileDialog.getOpenFileName(None, "Select Directory","", "CSV Files(*.csv)")
+    if(file_name == ""):
+        return
+    else:
+        self.getColCount = App_Count()
+        df_to_merge = pd.read_csv(file_name[0],skiprows=9)
+
+        df_id_num = df_to_merge[["ID Number"]]
+        df_contract_id = df_to_merge[["Utilities Asset Number"]]
+        df_type = df_to_merge[["Valve Type(GV, BFV, PV, ARV, BOV, etc)"]]
+
+        for row in range(int(self.getColCount.colcount)+1):
+            self.df = self.df.append({"Location": df_id_num["ID Number"][row], "Contractor ID#": df_contract_id["Utilities Asset Number"][row], "Structure":df_type["Valve Type(GV, BFV, PV, ARV, BOV, etc)"][row] }, ignore_index=True)
+        
+        self.model = PandasModel(self.df)
+        set_delegates(self, table)
+
+        table.setModel(self.model)
+    
+        table.show()
 
 def variation(self):
     

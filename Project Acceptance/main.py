@@ -221,10 +221,12 @@ class UI_Main_Window(object):
         self.send_signed.setGeometry(QtCore.QRect(20, 220, 113, 24))
         self.send_signed.setObjectName("send_signed")
 
-        self.import_csv = QtWidgets.QPushButton(self.options_pane)
-        self.import_csv.setEnabled(False)
-        self.import_csv.setGeometry(QtCore.QRect(20, 280, 113, 24))
-        self.import_csv.setObjectName("send_signed")
+        # send signed  button
+        self.import_csv_btn = QtWidgets.QPushButton(self.options_pane)
+        self.import_csv_btn.setEnabled(False)
+        self.import_csv_btn.setGeometry(QtCore.QRect(20, 250, 113, 24))
+        self.import_csv_btn.setObjectName("import_csv_btn")
+
 
         # Picture
         label = QtWidgets.QLabel(self.central_widget)
@@ -244,7 +246,6 @@ class UI_Main_Window(object):
         self.del_row.clicked.connect(lambda: remove_row(self,self.tableview))
     
         self.send_signed.clicked.connect(lambda: send(self))
-        self.import_csv.clicked.connect(lambda: import_from_book(self,self.tableview))
         
         self.create_new_Btn.clicked.connect(lambda: search_clicked(self))
         self.create_new_Btn.clicked.connect(lambda: create_new(self))
@@ -254,6 +255,8 @@ class UI_Main_Window(object):
         self.reset_btn.clicked.connect(lambda: self.reset_all())
         self.work_entry_Btn.clicked.connect(lambda:check_work_area(self))
 
+        self.import_csv_btn.clicked.connect(lambda:import_from_book(self, self.tableview))
+
         self.open_existing_Btn.clicked.connect(lambda:self.reset_btn.setEnabled(False))
         self.open_existing_Btn.clicked.connect(lambda:self.work_entry_Btn.setEnabled(False))
         self.open_existing_Btn.clicked.connect(lambda:self.planfile_Btn.setEnabled(False))
@@ -262,6 +265,7 @@ class UI_Main_Window(object):
         self.open_existing_Btn.clicked.connect(lambda:self.send_to_sign.setEnabled(True))
         self.open_existing_Btn.clicked.connect(lambda:self.save_btn.setEnabled(True))
         self.open_existing_Btn.clicked.connect(lambda:self.open_existing_Btn.setEnabled(False))
+        self.open_existing_Btn.clicked.connect(lambda:self.import_csv_btn.setEnabled(True))
 
         self.development_checkB.stateChanged.connect(self.onStateChange)
         self.CIP_checkB.stateChanged.connect(self.onStateChange) 
@@ -292,11 +296,11 @@ class UI_Main_Window(object):
         self.Dev_or_CIP_label.setText(_translate("MainWindow", "Development or CIP"))
         self.development_checkB.setText(_translate("MainWindow", "Development"))
         self.CIP_checkB.setText(_translate("MainWindow", "CIP"))
-        self.import_csv.setText(_translate("MainWindow", "Import CSV from WB"))
         self.active_folder_label.setText(_translate("MainWindow", "Folders Found"))
         self.pump_folder.setText(_translate("MainWindow", "Pump"))
         self.pressure_folder.setText(_translate("MainWindow", "Pressure"))
         self.gravity_folder.setText(_translate("MainWindow", "Gravity"))
+        self.import_csv_btn.setText(_translate("MainWindow", "Import CSV"))
 
     def onStateChange(self):
         if self.CIP_checkB.isChecked():
